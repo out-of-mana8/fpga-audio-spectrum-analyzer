@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPGA Audio Spectrum Analyzer</title>
+    <meta name="description" content="Real-time audio spectrum visualization on Altera Cyclone IV FPGA (DE2-115). Hardware-accelerated FFT, VGA output, and mixed-language logic design.">
+    <!-- Google Fonts: JetBrains Mono for premium monospace styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Dynamic Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <!-- Header / Hero Section -->
+        <header class="section reveal">
+            <div class="hero-image">
+                <img src="banner.svg" alt="FPGA Spectrum Analyzer Banner" />
+            </div>
+            <p class="tagline">Real-time Audio Spectrum Analyzer on a Cyclone IV FPGA</p>
+            <div class="badges">
+                <span class="badge badge-blue">FPGA: Cyclone IV E</span>
+                <span class="badge badge-orange">Board: DE2-115</span>
+                <span class="badge badge-green">SV + VHDL</span>
+                <span class="badge badge-purple">256-pt FFT</span>
+            </div>
+            <div class="cta-container">
+                <a href="https://github.com/out-of-mana8/fpga-audio-spectrum-analyzer" target="_blank" class="btn btn-glow">View on GitHub</a>
+            </div>
+        </header>
+
+        <!-- What it does -->
+        <section class="section reveal glass-panel">
+            <h2>> What it does_</h2>
+            <p>
+                Captures audio from the DE2-115's line-in jack, runs a 256-point radix-2 FFT in hardware, and displays the frequency spectrum in real time on both a VGA monitor and the board's 7-segment displays. Everything runs meticulously on the FPGA fabric at 50 MHz — no soft processor, no external memory, no software.
+            </p>
+            <div class="feature-image">
+                <img src="fpga_board.jpg" alt="FPGA Development Board" style="margin-bottom: 2rem; max-height: 400px; object-fit: cover; border-radius: 8px;" />
+                <img src="pipeline.svg" alt="Signal Pipeline Diagram" />
+            </div>
+        </section>
+
+        <!-- VGA Output -->
+        <section class="section reveal glass-panel">
+            <h2>> The Display_</h2>
+            <p>
+                The VGA output is the centerpiece. Operating at a resolution of <strong>640x480 @ 60 Hz</strong>, it is driven seamlessly through the DE2-115's onboard ADV7123 DAC.
+            </p>
+            
+            <div class="grid-features">
+                <div class="feature-card glass-panel">
+                    <h3>[01] Bar Graph</h3>
+                    <p>128 frequency bins, log-scaled magnitudes with priority-encoder interpolation. Features instant attack and 3 px/frame decay with a stunning 4-zone colormap.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h3>[02] Peak Hold</h3>
+                    <p>Bright cyan-white markers track the highest point per frequency bin and slowly descend over time for a professional analyzer aesthetic.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h3>[03] Waterfall</h3>
+                    <p>A lower 128-row scrolling heat-map tracks spectral history in real-time, utilizing block RAM and circular buffer traversal.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h3>[04] Overlays</h3>
+                    <p>Axis grids and textual labels (dB levels, frequency markers) are synthesized using a custom lightweight 4x5 pixel font ROM.</p>
+                </div>
+            </div>
+
+            <div class="feature-image layout-img">
+                <img src="vga_layout.svg" alt="VGA Display Layout" />
+            </div>
+        </section>
+
+        <!-- Architecture Breakdown -->
+        <section class="section reveal glass-panel">
+            <h2>> Technical Specs_</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>FFT Size</td><td>256 points (8-stage DIT)</td></tr>
+                        <tr><td>Sample Rate</td><td>48 kHz (WM8731 I2S)</td></tr>
+                        <tr><td>Frequency Resolution</td><td>~187.5 Hz/bin</td></tr>
+                        <tr><td>VGA Output</td><td>640 x 480 @ 60 Hz</td></tr>
+                        <tr><td>Pixel Clock</td><td>25 MHz</td></tr>
+                        <tr><td>Waterfall Depth</td><td>128 frames (~27s history)</td></tr>
+                        <tr><td>Block RAM Usage</td><td>~16 KB (Waterfall M9K) + Twiddle ROM</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="section reveal">
+            <p>// Developed for the Terasic DE2-115.</p>
+            <p>// Open-source under MIT License.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
