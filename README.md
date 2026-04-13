@@ -21,6 +21,10 @@
 Captures audio from the DE2-115's line-in jack, runs a 256-point radix-2 FFT in hardware, and displays the frequency spectrum in real time on both a VGA monitor and the board's 7-segment displays. Everything runs on the FPGA fabric at 50 MHz — no soft processor, no external memory, no software.
 
 <p align="center">
+  <img src="docs/fpga_board.jpg" alt="DE2-115 Development Board" width="80%" style="border-radius: 8px;"/>
+</p>
+
+<p align="center">
   <img src="docs/pipeline.svg" alt="Signal Pipeline" width="100%"/>
 </p>
 
