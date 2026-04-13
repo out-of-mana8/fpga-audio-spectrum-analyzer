@@ -1,0 +1,1 @@
+Warning (10268): Verilog HDL information at spectrum_analyzer_top.sv(228): always construct contains both blocking and non-blocking assignments File: Y:/Projects/New folder/spectrum_analyzer_top.sv Line: 228

@@ -1,17 +1,18 @@
-# Quartus Build Directories
+# ==============================================================================
+# Quartus Prime .gitignore — minimal, keep everything useful
+# ==============================================================================
+
+# Internal build databases (huge, fully regenerated every compile)
 db/
 incremental_db/
-output_files/
-simulation/
 greybox_tmp/
 
-# Quartus Temporary/Log Files
-*.rpt
-*.summary
-*.smsg
-*.jdi
-*.pin
+# Editor/lock files (transient, cause merge conflicts)
 *.qws
-*.bak
 *.flock
-*.qarlog
+*.bak
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini

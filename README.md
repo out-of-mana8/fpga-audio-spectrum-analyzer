@@ -1,307 +1,201 @@
-<div align="center">
+<p align="center">
+  <img src="docs/banner.svg" alt="FPGA Spectrum Analyzer" width="100%"/>
+</p>
 
-<br>
+<p align="center">
+  <b>Real-time audio spectrum analyzer on a Cyclone IV FPGA</b><br>
+  <sub>256-point FFT &nbsp;&bull;&nbsp; VGA output &nbsp;&bull;&nbsp; 7-segment display &nbsp;&bull;&nbsp; LED VU meter</sub>
+</p>
 
-```
-  ██████  ██▓███  ▓█████  ▄████▄  ▄▄▄█████▓ ██▀███   █    ██  ███▄ ▄███▓
-▒██    ▒ ▓██░  ██▒▓█   ▀ ▒██▀ ▀█  ▓  ██▒ ▓▒▓██ ▒ ██▒ ██  ▓██▒▓██▒▀█▀ ██▒
-░ ▓██▄   ▓██░ ██▓▒▒███   ▒▓█    ▄ ▒ ▓██░ ▒░▓██ ░▄█ ▒▓██  ▒██░▓██    ▓██░
-  ▒   ██▒▒██▄█▓▒ ▒▒▓█  ▄ ▒▓▓▄ ▄██▒░ ▓██▓ ░ ▒██▀▀█▄  ▓▓█  ░██░▒██    ▒██ 
-▒██████▒▒▒██▒ ░  ░░▒████▒▒ ▓███▀ ░  ▒██▒ ░ ░██▓ ▒██▒▒▒█████▓ ▒██▒   ░██▒
-▒ ▒▓▒ ▒ ░▒▓▒░ ░  ░░░ ▒░ ░░ ░▒ ▒  ░  ▒ ░░   ░ ▒▓ ░▒▓░░▒▓▒ ▒ ▒ ░ ▒░   ░  ░
-```
-
-# FPGA Audio Spectrum Analyzer
-
-**Real-Time 256-Point FFT · Logarithmic Bar Graph · Waterfall Spectrogram · VGA 640×480@60Hz**
-
-Built from scratch in **SystemVerilog + VHDL** for the Terasic DE2-115 (Altera Cyclone IV E)
-
-<br>
-
-[![FPGA](https://img.shields.io/badge/FPGA-Cyclone_IV_EP4CE115F29C7-0071C5?style=for-the-badge&logo=intel&logoColor=white)](#hardware-requirements)
-[![HDL](https://img.shields.io/badge/HDL-SystemVerilog_|_VHDL--93-4FC08D?style=for-the-badge)](#project-structure)
-[![VGA](https://img.shields.io/badge/Video-VGA_640×480@60Hz-E34F26?style=for-the-badge)](#display-engine-architecture)
-[![Audio](https://img.shields.io/badge/Codec-WM8731_I²S/I²C-FFD700?style=for-the-badge)](#audio-capture-pipeline)
-[![FFT](https://img.shields.io/badge/DSP-256--pt_Radix--2_FFT-9B59B6?style=for-the-badge)](#fft-engine)
-[![License](https://img.shields.io/badge/License-Open_Source-2ECC71?style=for-the-badge)](#license)
-
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/FPGA-Cyclone%20IV%20E-blue?style=flat-square" alt="FPGA"/>
+  <img src="https://img.shields.io/badge/Board-DE2--115-orange?style=flat-square" alt="Board"/>
+  <img src="https://img.shields.io/badge/Language-SystemVerilog%20%2B%20VHDL-green?style=flat-square" alt="Language"/>
+  <img src="https://img.shields.io/badge/Quartus-25.1%20Lite-purple?style=flat-square" alt="Quartus"/>
+</p>
 
 ---
 
-## Overview
+## What it does
 
-A fully hardware-implemented, real-time audio spectrum analyzer. No soft-core processors, no NIOS, no software stack — every operation from microphone capture through FFT computation to pixel-level VGA rendering is implemented as dedicated combinational and sequential logic on the FPGA fabric.
+Captures audio from the DE2-115's line-in jack, runs a 256-point radix-2 FFT in hardware, and displays the frequency spectrum in real time on both a VGA monitor and the board's 7-segment displays. Everything runs on the FPGA fabric at 50 MHz — no soft processor, no external memory, no software.
 
-The system captures 16-bit audio at 48 kHz via the Wolfson WM8731 codec over I²S, computes a continuous-pipeline 256-point Radix-2 Decimation-in-Time FFT, and drives a rich multi-zone VGA display at 640×480@60Hz through the onboard ADV7123 triple 10-bit DAC. Peripheral outputs include an 18-LED VU meter and 8 seven-segment displays showing real-time peak frequency (Hz) and magnitude.
+<p align="center">
+  <img src="docs/pipeline.svg" alt="Signal Pipeline" width="100%"/>
+</p>
 
-The design is fully mixed-language: the top-level datapath, FFT core, audio interfaces, and control logic are written in **SystemVerilog**, while the pixel-pipelined VGA display engine is written in **VHDL-93** — demonstrating seamless cross-language module instantiation in Intel Quartus Prime.
+## VGA display
 
----
+The VGA output is the centerpiece. 640x480 at 60 Hz, driven through the DE2-115's ADV7123 DAC.
 
-## System Architecture
+<p align="center">
+  <img src="docs/vga_layout.svg" alt="VGA Display Layout" width="80%"/>
+</p>
 
-```
-                         ┌─────────────────────────────────────────────────────────────┐
-                         │                    CYCLONE IV FPGA                          │
-                         │                                                             │
-  ┌──────────┐   I²S     │  ┌───────────┐   256 samples   ┌──────────────┐             │
-  │  WM8731  │──────────▶│  │ I2S       │   (bit-rev'd)   │  256-pt FFT  │             │
-  │  Codec   │◀──────────│  │ Capture   │────────────────▶│  Radix-2 DIT │             │
-  │          │   I²C     │  └───────────┘                  │  8 Stages    │             │
-  └──────────┘◀──────────│  ┌───────────┐                  │              │             │
-       │         init    │  │ WM8731    │                  │  Twiddle ROM │             │
-   MIC IN                │  │ Init (I²C)│                  │  128 × 32b   │             │
-                         │  └───────────┘                  └──────┬───────┘             │
-                         │                                        │                     │
-                         │                    128 × 16-bit magnitudes                   │
-                         │                           │                                  │
-                         │          ┌────────────────┬┴──────────────────┐               │
-                         │          ▼                ▼                   ▼               │
-                         │   ┌─────────────┐  ┌───────────┐    ┌──────────────┐         │
-                         │   │ Peak Detect │  │  VU Meter  │    │ VGA Display  │         │
-                         │   │ + BCD Conv  │  │  18× LEDR  │    │ Engine       │         │
-                         │   └──────┬──────┘  └───────────┘    │ (VHDL)       │         │
-                         │          ▼                           │              │  ──▶ VGA│
-                         │   ┌─────────────┐                   │ Bar Graph    │         │
-                         │   │ 8× HEX 7seg│                   │ Peak Hold    │         │
-                         │   │ Freq + Mag  │                   │ Waterfall    │         │
-                         │   └─────────────┘                   │ Axis Labels  │         │
-                         │                                     └──────────────┘         │
-                         └─────────────────────────────────────────────────────────────┘
-```
+**Bar graph** (top 320 px) — 128 frequency bins, each 4 px wide with 1 px gap. Magnitudes are log-scaled using a priority-encoder with fractional interpolation for smooth response. Bars have instant attack and gradual decay (3 px/frame at 60 fps). The colour gradient runs through four 80 px zones: dark blue, cyan, green/yellow, and red at the top.
 
----
+**Peak hold** — Bright cyan-white markers track the highest point per bin and slowly descend at ~15 px/s, giving that classic professional analyzer look.
 
-## Features
+**Waterfall spectrogram** (bottom 128 px) — A circular-buffer RAM stores the last 128 FFT frames, scrolling downward. Each row is coloured with a 5-zone heat-map palette: black through blue, cyan, yellow, red, and white for the loudest signals.
 
-### Audio Capture Pipeline
+**Axis labels** — Hardware-rendered 4x5 pixel bitmap font. Y-axis shows gain in dB (0, -20, -40, -60, -80). X-axis shows frequency (0, 5k, 10k, 15k, 20k kHz). Font ROM is a 17-character, 85-entry constant array synthesised as pure LUTs.
 
-The WM8731 codec is initialized over I²C using a bit-banged master (`i2c_master`) at a clock divider of 200 (250 kHz SCL from 50 MHz). The initialization sequencer (`wm8731_init`) writes 11 register values configuring the codec for line-in capture at full volume, 48 kHz sample rate, I²S format, 16-bit word length, and digital audio interface activation.
+**Divider strip** — Thin accent line with subtle border glow separates the bar graph from the waterfall.
 
-The `i2s_capture` module synchronizes the asynchronous `AUD_BCLK`, `AUD_ADCLRCK`, and `AUD_ADCDAT` signals into the 50 MHz clock domain using triple-register synchronizers. Left-channel samples are captured on the falling edge of LRCLK and shifted in MSB-first over 16 bit-clock rising edges. Each sample is stored directly into a 256-deep capture buffer at a **bit-reversed address** — performing the DIT input reordering in hardware, eliminating a separate permutation stage.
+## Board outputs
 
-Audio loopback is wired: `AUD_DACDAT = AUD_ADCDAT`, allowing headphone monitoring of the input signal.
+| Output | What it shows |
+|---|---|
+| **VGA** | 128-bin bar graph, peak hold, scrolling waterfall spectrogram |
+| **HEX7–4** | Peak frequency in Hz (decimal, BCD-converted) |
+| **HEX3–0** | Peak magnitude (hex) |
+| **LEDR[17:0]** | VU meter — 18 LEDs with peak-hold and decay |
+| **LEDG[0]** | PLL locked |
+| **LEDG[1]** | WM8731 codec configured |
+| **LEDG[2]** | FFT engine busy |
+| **LEDG[3]** | Frame heartbeat (~10 ms pulse per audio frame) |
 
-### FFT Engine
-
-The FFT core (`fft_core`) implements an 8-stage, in-place, Radix-2 Decimation-in-Time butterfly computation over 256 complex samples stored in dual 256×32-bit register-file RAMs (real and imaginary).
-
-**Pipeline stages:**
-
-| State | Operation |
-|:------|:----------|
-| `F_LOAD` | Bulk-load 256 bit-reversed samples from capture buffer into `ram_re[]`, zero-fill `ram_im[]` |
-| `F_SINIT` | Initialize stage parameters: half-size, block size, block count |
-| `F_RA/RB` | Compute butterfly pair indices: `top = blk × bsz + bfy`, `bot = top + hsz` |
-| `F_TW` | Address twiddle ROM: `addr = bfy << (7 - stage)` |
-| `F_CMP` | Butterfly: multiply-accumulate using 4 parallel 16×32 multipliers with Q15 fixed-point scaling |
-| `F_WR` | Write back: `ram[top] = (A + W·B) >> 1`, `ram[bot] = (A - W·B) >> 1` (scaling prevents overflow) |
-| `F_MAG` | Magnitude estimation via `max(|Re|,|Im|) + min(|Re|,|Im|)/4` (no sqrt needed) |
-
-The twiddle factor ROM stores 128 pre-computed entries as packed `{cos[15:0], sin[15:0]}` words in Q15 format, covering a full period of `e^{-j2πk/256}`. Butterfly complex multiplication resolves to four real multiplies and two additions, producing results in Q15 fixed-point with a 1-bit right-shift per stage to maintain headroom across all 8 stages.
-
-Magnitude output is clamped to 16 bits and streamed for bins 0–127 (positive-frequency half of the symmetric spectrum).
-
-### VGA Display Engine
-
-The display controller (`vga_spectrum_display.vhd`) generates a standard 640×480@60Hz VGA signal by dividing the 50 MHz system clock to 25 MHz. Pixel generation is organized into a 2-stage pipeline clocked on alternating phases of the pixel enable signal.
-
-**Screen layout (480 vertical lines):**
+## Architecture
 
 ```
-  y=0  ┌──────────────────────────────────────┐
-       │         (header / margin)             │  20 px
- y=20  ├──────────────────────────────────────┤
-       │                                      │
-       │     128-BIN BAR GRAPH                │  320 px
-       │     (logarithmic magnitude scaling)  │
-       │     with peak-hold markers           │
-       │                                      │
-y=339  ├──────────────────────────────────────┤
-       │  DIVIDER (axis labels: 0,5k,10k...) │  10 px
-y=349  ├──────────────────────────────────────┤
-       │                                      │
-       │     WATERFALL SPECTROGRAM            │  128 px
-       │     (scrolling heat-map history)     │
-       │                                      │
-y=477  └──────────────────────────────────────┘
+CLOCK_50 ──┬── PLL ──── 12.288 MHz MCLK ──── WM8731 codec
+            │
+            ├── I2C master ──── codec register init (11 regs)
+            │
+            ├── I2S capture ──── 16-bit samples @ 48 kHz
+            │       │
+            │       └── 256-sample frame buffer (bit-reversed addressing)
+            │
+            ├── FFT core ──── 8-stage radix-2 DIT butterfly
+            │       │
+            │       ├── twiddle ROM (128 x 32-bit, cos|sin)
+            │       └── magnitude estimator (|Re| + |Im|/4)
+            │
+            ├── Peak detector ──── tracks max bin per frame
+            │       └── BCD converter (double-dabble) ──── HEX displays
+            │
+            ├── VGA display ──── pixel pipeline @ 25 MHz
+            │       ├── bar graph (log-scaled, animated)
+            │       ├── peak hold markers
+            │       ├── waterfall RAM (128x128x8, M9K block RAM)
+            │       ├── colour gradient engine
+            │       └── font ROM + axis label overlay
+            │
+            └── VU meter ──── peak-hold with decay ──── LEDR[17:0]
 ```
 
-Each of the 128 frequency bins occupies 5 horizontal pixels (4 filled + 1 gap), spanning the full 640-pixel width. Bin-to-pixel mapping uses synthesized **divide-by-5 and mod-5 lookup tables** (640 entries each) to avoid runtime division hardware.
-
-**Logarithmic magnitude scaling** is computed with a priority-encoder-based `log_height()` function: the leading-one position yields the integer part of `log₂(magnitude)`, and 4 fractional bits below it are extracted via a case statement (avoiding non-constant bit-select). Height output is `22 × log₂(mag) + frac`, clamped to [0, 319].
-
-**Bar animation** runs once per VGA frame (triggered on vsync falling edge): instant attack to target height, then a smooth 3-pixel/frame exponential decay. **Peak-hold markers** (bright cyan, 2px tall) follow the highest bar target and decay at 1 pixel every 4 frames.
-
-The **waterfall spectrogram** stores 128 rows × 128 columns in a 16 KB M9K block RAM. Each new FFT frame writes one row at the current `wf_wr_row` pointer (incrementing modulo 128). Magnitude values are compressed from 16-bit to 8-bit using piecewise log scaling (`compress8`). During scanout, the row address wraps relative to `wf_wr_row` to create the scrolling effect.
-
-**Thermal color palette** (5-zone gradient for both bars and waterfall):
-
-| Zone | Bar Region | Waterfall Value | Color Transition |
-|:-----|:-----------|:----------------|:-----------------|
-| 0 | 0–79 px | 0–31 | Black → Deep Blue |
-| 1 | 80–159 px | 32–95 | Blue → Cyan |
-| 2 | 160–239 px | 96–159 | Cyan → Yellow |
-| 3 | 240–319 px | 160–223 | Yellow → Red |
-| 4 | (glow only) | 224–255 | Red → White-hot |
-
-**Text overlays** are rendered via a custom **4×5 pixel font ROM** (17 characters: `0-9`, `k`, `H`, `z`, `d`, `B`, `-`, space) stored as 85 × 4-bit entries. X-axis labels (0, 5k, 10k, 15k, 20k, kHz) and Y-axis dB scale markers (−20, −40, −60, −80) are hard-coded at specific pixel coordinates and rendered in a blue-gray tone.
-
-### Peripheral Outputs
-
-**VU Meter:** The 18 red LEDs implement a peak-hold VU meter with 18 non-linear thresholds (64, 128, 256, …, 32000) applied to the absolute value of each I²S sample. Peak tracking uses a sample-rate decay with a configurable hold counter.
-
-**7-Segment Displays:** HEX7–HEX4 show the dominant frequency bin converted to Hz (`bin × 188 Hz/bin` at 48 kHz / 256 points) via a Double-Dabble binary-to-BCD converter. HEX3–HEX0 show the raw peak magnitude in hexadecimal.
-
-**Status LEDs (Green):**
-
-| LED | Signal |
-|:----|:-------|
-| LEDG[0] | PLL locked (12.288 MHz audio MCLK) |
-| LEDG[1] | WM8731 I²C configuration complete |
-| LEDG[2] | FFT engine busy |
-| LEDG[3] | Frame capture rate indicator (pulse stretcher) |
-
----
-
-## Hardware Requirements
-
-| Component | Specification |
-|:----------|:-------------|
-| **FPGA Board** | Terasic DE2-115 — Altera Cyclone IV E `EP4CE115F29C7` |
-| **Audio Source** | 3.5mm microphone or line-level source into the WM8731 MIC/LINE jack |
-| **Display** | Any VGA-compatible monitor (640×480@60Hz minimum) |
-| **Cables** | VGA cable, 3.5mm audio cable |
-| **Toolchain** | Intel Quartus Prime 25.1+ (Lite Edition is sufficient) |
-
----
-
-## Project Structure
+## File structure
 
 ```
-fpga-audio-spectrum-analyzer/
-│
-├── spectrum_analyzer_top.sv        ← Top-level: reset, PLL, codec init, I2S, FFT,
-│                                     peak detect, BCD, VU meter, VGA instantiation
-│   ├── twiddle_rom                   128-entry cos/sin ROM (Q15 packed 32-bit)
-│   ├── i2c_master                    Bit-banged I²C controller (250 kHz)
-│   ├── wm8731_init                   11-register codec configuration sequencer
-│   ├── i2s_capture                   I²S receiver with bit-reversed sample buffer
-│   ├── fft_core                      256-point Radix-2 DIT FFT engine
-│   ├── hex_display                   Active-low 7-segment decoder
-│   └── audio_pll                     PLL wrapper (50 MHz → 12.288 MHz)
-│
-├── vga_spectrum_display.vhd        ← VHDL display controller
-│   ├── VGA timing generator          800×525 total, 25 MHz pixel clock
-│   ├── Magnitude capture & latch     Double-buffered FFT output
-│   ├── Log-scale converter           Priority-encoder log₂ approximation
-│   ├── Bar animator                  Attack/decay state machine
-│   ├── Peak-hold tracker             Per-bin peak with frame-rate decay
-│   ├── Waterfall RAM (M9K)           16 KB circular row buffer
-│   ├── 2-stage pixel pipeline        Bin lookup → color generation
-│   └── Font ROM & label renderer     4×5 bitmap font, axis annotations
-│
-├── pll_audio.vhd                   ← Quartus MegaWizard ALTPLL IP
-├── pll_audio.qip                   ← IP component declaration
-├── pll_audio.ppf                   ← PLL parameter file
-│
-├── pin_assignments.tcl             ← Complete DE2-115 pin mapping (Tcl script)
-├── vga_pin_assignments.qsf         ← VGA DAC pin subset
-├── spectrum.qpf                    ← Quartus project file
-└── spectrum.qsf                    ← Quartus settings file
+├── spectrum_analyzer_top.sv     # Top-level: all SV modules (I2C, I2S, FFT, etc.)
+├── vga_spectrum_display.vhd     # VGA display entity (VHDL-93)
+├── pll_audio.vhd                # Quartus PLL IP: 50 MHz → 12.288 MHz
+├── pll_audio.qip                # PLL IP integration file
+├── spectrum.qpf                 # Quartus project file
+├── spectrum.qsf                 # Quartus settings + pin assignments
+├── pin_assignments.tcl          # TCL script for all pin assignments
+└── docs/
+    ├── banner.svg               # README banner graphic
+    ├── pipeline.svg             # Signal pipeline diagram
+    └── vga_layout.svg           # VGA display layout diagram
 ```
 
----
+## Building
 
-## Getting Started
+**Requirements:** Quartus Prime 25.1 Lite (or later), DE2-115 board, VGA monitor, audio source with 3.5mm cable.
 
-### Build
+1. Clone the repo and open `spectrum.qpf` in Quartus
 
-1. Clone this repository and open `spectrum.qpf` in Intel Quartus Prime.
-2. Source the pin assignments from the Tcl console:
-   ```tcl
-   source pin_assignments.tcl
+2. Run the pin assignment script:
    ```
-3. Compile (Analysis & Synthesis → Fitter → Assembler). Quartus handles the mixed SystemVerilog + VHDL compilation natively.
+   Tools → Tcl Scripts → pin_assignments.tcl → Run
+   ```
+   Or from the Tcl console: `source pin_assignments.tcl`
 
-### Program
+3. Verify source files are registered:
+   - `spectrum_analyzer_top.sv` (SystemVerilog)
+   - `vga_spectrum_display.vhd` (VHDL)
+   - `pll_audio.qip` (PLL IP)
 
-1. Connect the DE2-115 via USB-Blaster.
-2. Plug a VGA monitor into the VGA port and a microphone into the pink MIC-IN jack.
-3. Open the Quartus Programmer, load `output_files/spectrum_analyzer_top.sof`, and click **Start**.
+   Check under Project → Add/Remove Files. Paths must be relative (no leading `/`).
 
-### Verify
+4. Compile: `Processing → Start Compilation` (Ctrl+L)
 
-| Indicator | Expected State |
-|:----------|:---------------|
-| LEDG[0] | ON — PLL locked |
-| LEDG[1] | ON — Codec configured |
-| LEDG[2] | Blinking — FFT processing frames |
-| LEDG[3] | ON — Audio frames arriving |
-| LEDR[0–17] | Bouncing with audio level |
-| VGA Monitor | Bar graph + waterfall rendering |
-| HEX7–4 | Dominant frequency in decimal Hz |
+5. Program: `Tools → Programmer → Start` (USB-Blaster, `.sof` file)
 
----
+6. Connect a VGA monitor and audio source, press KEY[0] to release reset
 
-## Technical Deep-Dives
+## How the FFT works
 
-### Clock Domains
+The `fft_core` implements a radix-2 decimation-in-time butterfly across 8 stages (log2(256) = 8). Input samples are stored in bit-reversed order by `i2s_capture` so the output comes out in natural order.
 
-The design operates across two clock domains:
+Each butterfly reads two complex values from RAM, multiplies the lower one by the appropriate twiddle factor from ROM (fixed-point Q15), and writes back the sum and difference with a right-shift for scaling. The twiddle ROM stores 128 entries of packed cos|sin in a single 32-bit word.
 
-| Domain | Frequency | Source | Usage |
-|:-------|:----------|:-------|:------|
-| `CLOCK_50` | 50 MHz | Board oscillator (PIN_Y2) | System clock, FFT, VGA timing, I²C |
-| `clk_12` | 12.288 MHz | ALTPLL from 50 MHz | WM8731 MCLK (`AUD_XCK`) |
+After all 8 stages, the magnitude estimator approximates `sqrt(Re^2 + Im^2)` using the fast formula `max(|Re|,|Im|) + min(|Re|,|Im|)/4`, which is accurate to within ~4% and costs zero multipliers.
 
-The I²S interface signals (`AUD_BCLK`, `AUD_ADCLRCK`, `AUD_ADCDAT`) are generated by the codec in the 12.288 MHz domain and crossed into the 50 MHz domain via triple-register synchronizers in `i2s_capture`.
+## How the VGA display works
 
-The 25 MHz VGA pixel clock is derived from `CLOCK_50` via a toggle flip-flop (`pclk_en`), driving the ADV7123 DAC clock output and gating pixel-pipeline advancement.
+The display runs a 2-stage pixel pipeline at 50 MHz (25 MHz pixel rate via toggle enable):
 
-### FFT Numerical Format
+- **Stage 0:** Determines the bin index from the x-coordinate using a synthesis-time LUT (divide-by-5 and mod-5, no runtime divider), reads the bar height and peak value from register arrays, and issues the waterfall RAM address.
 
-All butterfly computations use 32-bit signed fixed-point internally. Input samples are sign-extended from 16-bit to 32-bit on load. Twiddle factors are Q15 (1 sign bit + 15 fractional bits). Butterfly products are 48-bit and right-shifted by 15 to return to Q32. An additional 1-bit right-shift per stage (the `>>>1` on output assignments) prevents overflow accumulation across 8 stages, equivalent to a 1/N scaling.
+- **Stage 1:** Generates the pixel colour based on zone (bar area, divider, waterfall, border), applies the 4-zone gradient for bars, renders peak-hold markers, overlays grid lines, and runs the heat-map palette for waterfall pixels. Finally, the font overlay checks if the current pixel belongs to an axis label character and renders it in blue-gray.
 
-### Magnitude Approximation
+The waterfall uses 16 KB of block RAM (128 rows x 128 columns x 8-bit intensity, inferred as M9K). A circular row pointer advances each FFT frame, so the display scrolls without any data movement.
 
-The `F_MAG` state avoids expensive square-root hardware by using the `alpha-max-beta-min` approximation:
+## Pin map
 
-```
-|Z| ≈ max(|Re|, |Im|) + min(|Re|, |Im|) / 4
-```
+All 88 pins are assigned via `pin_assignments.tcl`:
 
-This provides ~4% maximum error relative to the true Euclidean magnitude — more than sufficient for display purposes and dramatically cheaper in LUT/register usage than a CORDIC or multiplier-based approach.
+| Group | Pins | I/O Standard |
+|---|---|---|
+| Clock | `CLOCK_50` (PIN_Y2) | 3.3-V LVTTL |
+| Keys | `KEY[3:0]` | 2.5 V |
+| Audio | `AUD_XCK`, `BCLK`, `ADCLRCK`, `ADCDAT`, `DACLRCK`, `DACDAT` | 3.3-V LVTTL |
+| I2C | `I2C_SCLK`, `I2C_SDAT` | 3.3-V LVTTL |
+| VGA | `VGA_CLK`, `HS`, `VS`, `BLANK_N`, `SYNC_N`, `R/G/B[7:0]` | 3.3-V LVTTL |
+| 7-Seg | `HEX0`–`HEX7` (7 bits each) | 2.5 V |
+| LEDs | `LEDG[7:0]`, `LEDR[17:0]` | 2.5 V |
 
-### Display Rendering Budget
+## Technical specs
 
-At 25 MHz pixel clock, the display engine has exactly **40 ns per pixel**. The 2-stage pipeline ensures all combinational logic (bin lookup via LUT, bar/peak comparison, color gradient computation, waterfall RAM read, font ROM lookup, and mux) is partitioned across two 50 MHz clock cycles, meeting timing with margin.
+| Parameter | Value |
+|---|---|
+| FFT size | 256 points |
+| Sample rate | 48 kHz (WM8731) |
+| Frequency resolution | 187.5 Hz/bin |
+| Displayable range | 0–24 kHz (128 bins, Nyquist) |
+| VGA resolution | 640 x 480 @ 60 Hz |
+| Pixel clock | 25 MHz (50 MHz / 2) |
+| Audio MCLK | 12.288 MHz (PLL from 50 MHz) |
+| Waterfall depth | 128 frames (~27 s at 4.7 fps) |
+| Block RAM usage | ~16 KB (waterfall) + twiddle ROM |
+| Target device | EP4CE115F29C7 (Cyclone IV E, 115K LEs) |
 
-The waterfall RAM is implemented in Cyclone IV M9K block RAM (inferred via the `ramstyle` attribute), providing single-cycle read latency with no resource pressure on the logic fabric.
+## Codec configuration
 
----
+The WM8731 is configured over I2C at startup with 11 register writes:
 
-## Resource Utilization (Estimated)
-
-| Resource | Usage | Available | Notes |
-|:---------|:------|:----------|:------|
-| Logic Elements | ~6,000 | 114,480 | FFT butterfly + VGA pipeline |
-| M9K Blocks | ~2 | 432 | Waterfall RAM + twiddle ROM |
-| PLLs | 1 | 4 | 50 MHz → 12.288 MHz |
-| Multipliers | 4 | 532 | FFT butterfly (18×18 embedded) |
-| I/O Pins | ~120 | 528 | VGA (27) + Audio (6) + HEX (56) + LED (26) |
-
----
+| Register | Value | Function |
+|---|---|---|
+| `0x1E` | `0x00` | Reset |
+| `0x00` | `0x17` | Left line-in volume |
+| `0x02` | `0x17` | Right line-in volume |
+| `0x04` | `0x79` | Left headphone volume |
+| `0x06` | `0x79` | Right headphone volume |
+| `0x08` | `0x15` | Analog path: mic boost off, line-in select, DAC select |
+| `0x0A` | `0x00` | Digital path: no de-emphasis, no filters |
+| `0x0C` | `0x00` | Power: everything on |
+| `0x0E` | `0x42` | Interface: I2S, 16-bit, slave mode |
+| `0x10` | `0x00` | Sampling: normal mode, 48 kHz |
+| `0x12` | `0x01` | Active |
 
 ## License
 
-This project is open-source. Free for educational, personal, and commercial use. Attribution appreciated but not required.
+MIT
 
-<div align="center">
-<br>
+---
 
-*Built with RTL, not software.*
-
-</div>
+<p align="center">
+  <sub>Built for the DE2-115 &nbsp;&bull;&nbsp; Vanderbilt University &nbsp;&bull;&nbsp; ECE 4377</sub>
+</p>

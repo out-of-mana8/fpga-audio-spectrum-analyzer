@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#06081a"/>
+      <stop offset="100%" stop-color="#0a0e24"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#1a3a8a"/>
+      <stop offset="20%" stop-color="#00aaff"/>
+      <stop offset="45%" stop-color="#00ddaa"/>
+      <stop offset="70%" stop-color="#ccee00"/>
+      <stop offset="100%" stop-color="#ff3322"/>
+    </linearGradient>
+    <linearGradient id="wfGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#000828"/>
+      <stop offset="25%" stop-color="#0044aa"/>
+      <stop offset="50%" stop-color="#00ccaa"/>
+      <stop offset="75%" stop-color="#ddcc00"/>
+      <stop offset="100%" stop-color="#ff2200"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="barClip"><rect x="60" y="30" width="780" height="180"/></clipPath>
+  </defs>
+
+  <rect width="900" height="320" fill="url(#bg)" rx="8"/>
+
+  <!-- Subtle grid -->
+  <line x1="60" y1="75" x2="840" y2="75" stroke="#0e1e3a" stroke-width="0.5"/>
+  <line x1="60" y1="120" x2="840" y2="120" stroke="#0e1e3a" stroke-width="0.5"/>
+  <line x1="60" y1="165" x2="840" y2="165" stroke="#0e1e3a" stroke-width="0.5"/>
+
+  <!-- Y-axis labels -->
+  <text x="50" y="40" fill="#3a5580" font-family="monospace" font-size="8" text-anchor="end">dB</text>
+  <text x="50" y="78" fill="#2a4568" font-family="monospace" font-size="7" text-anchor="end">-20</text>
+  <text x="50" y="123" fill="#2a4568" font-family="monospace" font-size="7" text-anchor="end">-40</text>
+  <text x="50" y="168" fill="#2a4568" font-family="monospace" font-size="7" text-anchor="end">-60</text>
+
+  <!-- Spectrum bars -->
+  <g clip-path="url(#barClip)" filter="url(#glow)">
+    <rect x="65" y="185" width="4" height="25" fill="url(#barGrad)" rx="1"/>
+    <rect x="71" y="175" width="4" height="35" fill="url(#barGrad)" rx="1"/>
+    <rect x="77" y="160" width="4" height="50" fill="url(#barGrad)" rx="1"/>
+    <rect x="83" y="140" width="4" height="70" fill="url(#barGrad)" rx="1"/>
+    <rect x="89" y="118" width="4" height="92" fill="url(#barGrad)" rx="1"/>
+    <rect x="95" y="95" width="4" height="115" fill="url(#barGrad)" rx="1"/>
+    <rect x="101" y="72" width="4" height="138" fill="url(#barGrad)" rx="1"/>
+    <rect x="107" y="55" width="4" height="155" fill="url(#barGrad)" rx="1"/>
+    <rect x="113" y="42" width="4" height="168" fill="url(#barGrad)" rx="1"/>
+    <rect x="119" y="34" width="4" height="176" fill="url(#barGrad)" rx="1"/>
+    <rect x="125" y="38" width="4" height="172" fill="url(#barGrad)" rx="1"/>
+    <rect x="131" y="50" width="4" height="160" fill="url(#barGrad)" rx="1"/>
+    <rect x="137" y="65" width="4" height="145" fill="url(#barGrad)" rx="1"/>
+    <rect x="143" y="82" width="4" height="128" fill="url(#barGrad)" rx="1"/>
+    <rect x="149" y="98" width="4" height="112" fill="url(#barGrad)" rx="1"/>
+    <rect x="155" y="110" width="4" height="100" fill="url(#barGrad)" rx="1"/>
+    <rect x="161" y="90" width="4" height="120" fill="url(#barGrad)" rx="1"/>
+    <rect x="167" y="72" width="4" height="138" fill="url(#barGrad)" rx="1"/>
+    <rect x="173" y="58" width="4" height="152" fill="url(#barGrad)" rx="1"/>
+    <rect x="179" y="50" width="4" height="160" fill="url(#barGrad)" rx="1"/>
+    <rect x="185" y="55" width="4" height="155" fill="url(#barGrad)" rx="1"/>
+    <rect x="191" y="68" width="4" height="142" fill="url(#barGrad)" rx="1"/>
+    <rect x="197" y="80" width="4" height="130" fill="url(#barGrad)" rx="1"/>
+    <rect x="203" y="95" width="4" height="115" fill="url(#barGrad)" rx="1"/>
+    <rect x="209" y="108" width="4" height="102" fill="url(#barGrad)" rx="1"/>
+    <rect x="215" y="120" width="4" height="90" fill="url(#barGrad)" rx="1"/>
+    <rect x="221" y="115" width="4" height="95" fill="url(#barGrad)" rx="1"/>
+    <rect x="227" y="105" width="4" height="105" fill="url(#barGrad)" rx="1"/>
+    <rect x="233" y="110" width="4" height="100" fill="url(#barGrad)" rx="1"/>
+    <rect x="239" y="118" width="4" height="92" fill="url(#barGrad)" rx="1"/>
+    <rect x="245" y="125" width="4" height="85" fill="url(#barGrad)" rx="1"/>
+    <rect x="251" y="130" width="4" height="80" fill="url(#barGrad)" rx="1"/>
+    <rect x="257" y="138" width="4" height="72" fill="url(#barGrad)" rx="1"/>
+    <rect x="263" y="142" width="4" height="68" fill="url(#barGrad)" rx="1"/>
+    <rect x="269" y="148" width="4" height="62" fill="url(#barGrad)" rx="1"/>
+    <rect x="275" y="152" width="4" height="58" fill="url(#barGrad)" rx="1"/>
+    <rect x="281" y="155" width="4" height="55" fill="url(#barGrad)" rx="1"/>
+    <rect x="287" y="160" width="4" height="50" fill="url(#barGrad)" rx="1"/>
+    <rect x="293" y="163" width="4" height="47" fill="url(#barGrad)" rx="1"/>
+    <rect x="299" y="167" width="4" height="43" fill="url(#barGrad)" rx="1"/>
+    <rect x="305" y="170" width="4" height="40" fill="url(#barGrad)" rx="1"/>
+    <rect x="311" y="168" width="4" height="42" fill="url(#barGrad)" rx="1"/>
+    <rect x="317" y="165" width="4" height="45" fill="url(#barGrad)" rx="1"/>
+    <rect x="323" y="162" width="4" height="48" fill="url(#barGrad)" rx="1"/>
+    <rect x="329" y="160" width="4" height="50" fill="url(#barGrad)" rx="1"/>
+    <rect x="335" y="163" width="4" height="47" fill="url(#barGrad)" rx="1"/>
+    <rect x="341" y="167" width="4" height="43" fill="url(#barGrad)" rx="1"/>
+    <rect x="347" y="170" width="4" height="40" fill="url(#barGrad)" rx="1"/>
+    <rect x="353" y="172" width="4" height="38" fill="url(#barGrad)" rx="1"/>
+    <rect x="359" y="175" width="4" height="35" fill="url(#barGrad)" rx="1"/>
+    <rect x="365" y="177" width="4" height="33" fill="url(#barGrad)" rx="1"/>
+    <rect x="371" y="179" width="4" height="31" fill="url(#barGrad)" rx="1"/>
+    <rect x="377" y="180" width="4" height="30" fill="url(#barGrad)" rx="1"/>
+    <rect x="383" y="182" width="4" height="28" fill="url(#barGrad)" rx="1"/>
+    <rect x="389" y="183" width="4" height="27" fill="url(#barGrad)" rx="1"/>
+    <rect x="395" y="185" width="4" height="25" fill="url(#barGrad)" rx="1"/>
+    <rect x="401" y="186" width="4" height="24" fill="url(#barGrad)" rx="1"/>
+    <rect x="407" y="187" width="4" height="23" fill="url(#barGrad)" rx="1"/>
+    <rect x="413" y="189" width="4" height="21" fill="url(#barGrad)" rx="1"/>
+    <rect x="419" y="190" width="4" height="20" fill="url(#barGrad)" rx="1"/>
+    <rect x="425" y="191" width="4" height="19" fill="url(#barGrad)" rx="1"/>
+    <rect x="431" y="192" width="4" height="18" fill="url(#barGrad)" rx="1"/>
+    <rect x="437" y="193" width="4" height="17" fill="url(#barGrad)" rx="1"/>
+    <rect x="443" y="194" width="4" height="16" fill="url(#barGrad)" rx="1"/>
+    <rect x="449" y="195" width="4" height="15" fill="url(#barGrad)" rx="1"/>
+  </g>
+
+  <!-- Peak hold dots -->
+  <g fill="#aaeeff" opacity="0.9">
+    <rect x="113" y="37" width="4" height="2" rx="0.5"/>
+    <rect x="119" y="29" width="4" height="2" rx="0.5"/>
+    <rect x="125" y="33" width="4" height="2" rx="0.5"/>
+    <rect x="173" y="52" width="4" height="2" rx="0.5"/>
+    <rect x="179" y="44" width="4" height="2" rx="0.5"/>
+    <rect x="185" y="48" width="4" height="2" rx="0.5"/>
+  </g>
+
+  <!-- Divider -->
+  <line x1="60" y1="214" x2="840" y2="214" stroke="#2244aa" stroke-width="0.5" opacity="0.6"/>
+  <!-- X-axis labels -->
+  <text x="65" y="224" fill="#2a4568" font-family="monospace" font-size="7">0</text>
+  <text x="158" y="224" fill="#2a4568" font-family="monospace" font-size="7">5k</text>
+  <text x="260" y="224" fill="#2a4568" font-family="monospace" font-size="7">10k</text>
+  <text x="365" y="224" fill="#2a4568" font-family="monospace" font-size="7">15k</text>
+  <text x="445" y="224" fill="#2a4568" font-family="monospace" font-size="7">20k</text>
+  <text x="800" y="224" fill="#2a4568" font-family="monospace" font-size="7">kHz</text>
+  <line x1="60" y1="227" x2="840" y2="227" stroke="#2244aa" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Waterfall rows -->
+  <rect x="60" y="230" width="780" height="60" fill="#000818" rx="0"/>
+  <rect x="60" y="230" width="780" height="3" fill="#0e3888" opacity="0.7"/>
+  <rect x="60" y="233" width="780" height="3" fill="#092866" opacity="0.6"/>
+  <rect x="60" y="236" width="780" height="3" fill="#071e50" opacity="0.5"/>
+  <rect x="60" y="239" width="780" height="3" fill="#051640" opacity="0.4"/>
+  <rect x="60" y="242" width="780" height="3" fill="#040e30" opacity="0.3"/>
+  <!-- Hotspots in waterfall -->
+  <rect x="100" y="230" width="80" height="3" fill="#ffcc00" opacity="0.65"/>
+  <rect x="100" y="233" width="70" height="3" fill="#ff8800" opacity="0.45"/>
+  <rect x="100" y="236" width="55" height="3" fill="#cc4400" opacity="0.35"/>
+  <rect x="160" y="230" width="40" height="3" fill="#00dd88" opacity="0.5"/>
+  <rect x="160" y="233" width="30" height="3" fill="#009966" opacity="0.35"/>
+  <rect x="220" y="230" width="35" height="3" fill="#5588ff" opacity="0.4"/>
+
+  <!-- Title -->
+  <text x="450" y="280" fill="#e8ecf4" font-family="'Courier New', monospace" font-size="28" font-weight="700" text-anchor="middle" letter-spacing="4">FPGA SPECTRUM ANALYZER</text>
+  <text x="450" y="302" fill="#4a6a8a" font-family="'Courier New', monospace" font-size="12" text-anchor="middle" letter-spacing="6">DE2-115  //  256-PT FFT  //  VGA + 7-SEG  //  REAL-TIME</text>
+</svg>

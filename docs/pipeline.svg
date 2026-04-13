@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200">
+  <defs>
+    <linearGradient id="bgp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#06081a"/>
+      <stop offset="100%" stop-color="#0c1028"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="200" fill="url(#bgp)" rx="8"/>
+
+  <!-- Pipeline boxes -->
+  <!-- Mic -->
+  <rect x="30" y="60" width="100" height="56" rx="6" fill="#101830" stroke="#2a5588" stroke-width="1"/>
+  <text x="80" y="84" fill="#88bbee" font-family="'Courier New',monospace" font-size="11" font-weight="700" text-anchor="middle">MIC IN</text>
+  <text x="80" y="100" fill="#4a6a8a" font-family="'Courier New',monospace" font-size="8" text-anchor="middle">Line-in jack</text>
+
+  <!-- Arrow -->
+  <line x1="135" y1="88" x2="165" y2="88" stroke="#2a5588" stroke-width="1.5" marker-end="url(#ap)"/>
+  <defs><marker id="ap" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 2L8 5L2 8" fill="none" stroke="#2a5588" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+
+  <!-- WM8731 -->
+  <rect x="170" y="60" width="120" height="56" rx="6" fill="#101830" stroke="#3366aa" stroke-width="1"/>
+  <text x="230" y="84" fill="#88bbee" font-family="'Courier New',monospace" font-size="11" font-weight="700" text-anchor="middle">WM8731</text>
+  <text x="230" y="100" fill="#4a6a8a" font-family="'Courier New',monospace" font-size="8" text-anchor="middle">I2S @ 48 kHz</text>
+
+  <line x1="295" y1="88" x2="325" y2="88" stroke="#2a5588" stroke-width="1.5" marker-end="url(#ap)"/>
+
+  <!-- I2S Capture -->
+  <rect x="330" y="60" width="120" height="56" rx="6" fill="#101830" stroke="#3388aa" stroke-width="1"/>
+  <text x="390" y="84" fill="#88bbee" font-family="'Courier New',monospace" font-size="11" font-weight="700" text-anchor="middle">I2S CAPTURE</text>
+  <text x="390" y="100" fill="#4a6a8a" font-family="'Courier New',monospace" font-size="8" text-anchor="middle">256 samples + bitrev</text>
+
+  <line x1="455" y1="88" x2="485" y2="88" stroke="#2a5588" stroke-width="1.5" marker-end="url(#ap)"/>
+
+  <!-- FFT -->
+  <rect x="490" y="60" width="120" height="56" rx="6" fill="#10182a" stroke="#44aa88" stroke-width="1"/>
+  <text x="550" y="84" fill="#88eecc" font-family="'Courier New',monospace" font-size="11" font-weight="700" text-anchor="middle">256-PT FFT</text>
+  <text x="550" y="100" fill="#4a8a6a" font-family="'Courier New',monospace" font-size="8" text-anchor="middle">8-stage butterfly</text>
+
+  <line x1="615" y1="88" x2="645" y2="88" stroke="#2a5588" stroke-width="1.5" marker-end="url(#ap)"/>
+
+  <!-- VGA Display -->
+  <rect x="650" y="40" width="130" height="46" rx="6" fill="#10182a" stroke="#cc8800" stroke-width="1"/>
+  <text x="715" y="60" fill="#ffcc66" font-family="'Courier New',monospace" font-size="11" font-weight="700" text-anchor="middle">VGA 640x480</text>
+  <text x="715" y="74" fill="#8a6a30" font-family="'Courier New',monospace" font-size="8" text-anchor="middle">Bars + waterfall</text>
+
+  <!-- HEX + LED -->
+  <rect x="650" y="96" width="130" height="46" rx="6" fill="#10182a" stroke="#aa4444" stroke-width="1"/>
+  <text x="715" y="116" fill="#ff8888" font-family="'Courier New',monospace" font-size="11" font-weight="700" text-anchor="middle">HEX + LEDs</text>
+  <text x="715" y="130" fill="#8a4040" font-family="'Courier New',monospace" font-size="8" text-anchor="middle">Freq + VU meter</text>
+
+  <!-- Fork arrows to VGA and HEX -->
+  <path d="M645 88 L648 88 L648 63 L650 63" fill="none" stroke="#2a5588" stroke-width="1" marker-end="url(#ap)"/>
+  <path d="M645 88 L648 88 L648 119 L650 119" fill="none" stroke="#2a5588" stroke-width="1" marker-end="url(#ap)"/>
+
+  <!-- Clock/config info at bottom -->
+  <text x="80" y="145" fill="#223355" font-family="'Courier New',monospace" font-size="8">I2C config</text>
+  <path d="M80 148 L80 155 L230 155 L230 120" fill="none" stroke="#223355" stroke-width="0.5" stroke-dasharray="3 2"/>
+
+  <text x="450" y="170" fill="#1a2844" font-family="'Courier New',monospace" font-size="9" text-anchor="middle">CLOCK_50 (50 MHz)  ────────────────  PLL: 12.288 MHz MCLK  ────────────────  Pixel clock: 25 MHz (div-2)</text>
+</svg>

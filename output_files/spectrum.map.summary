@@ -1,0 +1,14 @@
+Analysis & Synthesis Status : Successful - Sun Apr 12 18:49:59 2026
+Quartus Prime Version : 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+Revision Name : spectrum
+Top-level Entity Name : spectrum_analyzer_top
+Family : Cyclone IV E
+Total logic elements : 59,170
+    Total combinational functions : 51,536
+    Dedicated logic registers : 24,049
+Total registers : 24049
+Total pins : 124
+Total virtual pins : 0
+Total memory bits : 139,264
+Embedded Multiplier 9-bit elements : 17
+Total PLLs : 1
