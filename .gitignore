@@ -1,0 +1,17 @@
+# Quartus Build Directories
+db/
+incremental_db/
+output_files/
+simulation/
+greybox_tmp/
+
+# Quartus Temporary/Log Files
+*.rpt
+*.summary
+*.smsg
+*.jdi
+*.pin
+*.qws
+*.bak
+*.flock
+*.qarlog
